@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { LoginForm } from '../features/auth/LoginForm';
+import { MapWorkspace } from '../features/parcelas/components/MapWorkspace';
 
 // =====================================================================
 // 1. PLACEHOLDERS TEMPORALES (Luego los moveremos a la capa "pages/")
@@ -18,17 +19,30 @@ const LandingPage = () => (
 
 const RegisterPage = () => <div className="p-10">Formulario de Registro temporal...</div>;
 
-const DashboardPage = () => (
-  <div className="p-10 bg-slate-100 min-h-screen">
-    <h1 className="text-2xl font-bold">Panel Principal</h1>
-    <button className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded">
-      Dibuja tu Parcela
-    </button>
-    <div className="mt-4 h-64 bg-slate-300 border-2 border-dashed border-slate-500 flex items-center justify-center">
-      (Aquí irá React Leaflet)
+const DashboardPage = () => {
+  const logout = useAuthStore((state) => state.logout);
+
+  return (
+    <div className="p-6 bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-slate-800">Panel Agroespacial</h1>
+          <button 
+            onClick={logout}
+            className="bg-red-50 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 font-medium transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
+        
+        {/* Aquí inyectamos el mapa FSD */}
+        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+          <MapWorkspace />
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // =====================================================================
 // 2. EL GUARDIÁN DE RUTAS REAL (Conectado a Zustand)

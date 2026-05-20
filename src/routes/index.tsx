@@ -4,8 +4,13 @@ import { useAuthStore } from '../stores/authStore';
 import { LoginForm } from '../features/auth/LoginForm';
 import { MapWorkspace } from '../features/parcelas/components/MapWorkspace';
 
+// 1. Importamos la nueva infraestructura Admin
+import { AdminGuard } from '../features/auth/components/AdminGuard';
+import { AdminLayout } from '../layouts/AdminLayout';
+import { RegionManager } from '../features/regiones/routes/RegionManager';
+
 // =====================================================================
-// 1. PLACEHOLDERS TEMPORALES (Luego los moveremos a la capa "pages/")
+// PLACEHOLDERS TEMPORALES
 // =====================================================================
 const LandingPage = () => (
   <div className="p-10 text-center">
@@ -34,8 +39,6 @@ const DashboardPage = () => {
             Cerrar Sesión
           </button>
         </div>
-        
-        {/* Aquí inyectamos el mapa FSD */}
         <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
           <MapWorkspace />
         </div>
@@ -45,32 +48,26 @@ const DashboardPage = () => {
 };
 
 // =====================================================================
-// 2. EL GUARDIÁN DE RUTAS REAL (Conectado a Zustand)
+// EL GUARDIÁN DE RUTAS DE USUARIO NORMAL
 // =====================================================================
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  // Ahora Zustand decide si hay token o no
   const token = useAuthStore((state) => state.token);
-
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-  return children;
+  if (!token) return <Navigate to="/login" replace />;
+  return <>{children}</>;
 };
 
 // =====================================================================
-// 3. LA TORRE DE CONTROL
+// LA TORRE DE CONTROL
 // =====================================================================
 export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-
-        {/* Reemplazamos el placeholder por el componente real */}
         <Route path="/login" element={<LoginForm />} />
-
         <Route path="/register" element={<RegisterPage />} />
 
+        {/* Zona de Usuario Normal */}
         <Route
           path="/dashboard"
           element={
@@ -79,6 +76,26 @@ export const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* ================================================================= */}
+        {/* NUEVA ZONA: Panel de Administración protegido por el AdminGuard   */}
+        {/* ================================================================= */}
+        <Route 
+          path="/admin" 
+          element={
+            <AdminGuard>
+              <AdminLayout />
+            </AdminGuard>
+          }
+        >
+          {/* El index route para redirigir si entran a /admin a secas */}
+          <Route index element={<Navigate to="regiones" replace />} />
+          
+          {/* La ruta que estaba buscando el LoginForm (/admin/regiones) */}
+          <Route path="regiones" element={<RegionManager />} />
+        </Route>
+
+        {/* Ruta comodín para cualquier otra URL */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

@@ -1,102 +1,28 @@
 // src/routes/index.tsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from '../stores/authStore';
-import { LoginForm } from '../features/auth/LoginForm';
-import { MapWorkspace } from '../features/parcelas/components/MapWorkspace';
 
-// 1. Importamos la nueva infraestructura Admin
-import { AdminGuard } from '../features/auth/components/AdminGuard';
+// Importamos solo lo que necesitamos: Layout y el Manager de Regiones
 import { AdminLayout } from '../layouts/AdminLayout';
 import { RegionManager } from '../features/regiones/routes/RegionManager';
 
 // =====================================================================
-// PLACEHOLDERS TEMPORALES
-// =====================================================================
-const LandingPage = () => (
-  <div className="p-10 text-center">
-    <h1 className="text-3xl font-bold mb-4">Bienvenido a Tepozixtli</h1>
-    <div className="flex justify-center gap-4">
-      <a href="/login" className="bg-blue-600 text-white px-4 py-2 rounded">Iniciar Sesión</a>
-      <a href="/register" className="bg-green-600 text-white px-4 py-2 rounded">Registrarse</a>
-    </div>
-  </div>
-);
-
-const RegisterPage = () => <div className="p-10">Formulario de Registro temporal...</div>;
-
-const DashboardPage = () => {
-  const logout = useAuthStore((state) => state.logout);
-
-  return (
-    <div className="p-6 bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-slate-800">Panel Agroespacial</h1>
-          <button 
-            onClick={logout}
-            className="bg-red-50 text-red-600 px-4 py-2 rounded-md hover:bg-red-100 font-medium transition-colors"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-        <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-          <MapWorkspace />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// =====================================================================
-// EL GUARDIÁN DE RUTAS DE USUARIO NORMAL
-// =====================================================================
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const token = useAuthStore((state) => state.token);
-  if (!token) return <Navigate to="/login" replace />;
-  return <>{children}</>;
-};
-
-// =====================================================================
-// LA TORRE DE CONTROL
+// LA TORRE DE CONTROL (VERSIÓN DESBLOQUEADA)
 // =====================================================================
 export const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterPage />} />
-
-        {/* Zona de Usuario Normal */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-
-        {/* ================================================================= */}
-        {/* NUEVA ZONA: Panel de Administración protegido por el AdminGuard   */}
-        {/* ================================================================= */}
-        <Route 
-          path="/admin" 
-          element={
-            <AdminGuard>
-              <AdminLayout />
-            </AdminGuard>
-          }
-        >
-          {/* El index route para redirigir si entran a /admin a secas */}
+        {/* Envolvemos la aplicación en tu Layout principal */}
+        <Route path="/" element={<AdminLayout />}>
+          {/* Redirigimos la raíz (/) directamente a /regiones */}
           <Route index element={<Navigate to="regiones" replace />} />
           
-          {/* La ruta que estaba buscando el LoginForm (/admin/regiones) */}
+          {/* Tu espacio de trabajo principal */}
           <Route path="regiones" element={<RegionManager />} />
         </Route>
 
-        {/* Ruta comodín para cualquier otra URL */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Ruta comodín para cualquier URL que no exista: te regresa a regiones */}
+        <Route path="*" element={<Navigate to="/regiones" replace />} />
       </Routes>
     </BrowserRouter>
   );

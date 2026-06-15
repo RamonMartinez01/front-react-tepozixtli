@@ -15,5 +15,5 @@ export interface LoginCredentials {
 export interface LoginResponse {
   access_token: string;
   token_type: string;
-  usuario: User; // El pasaporte completo que tu Postman acaba de validar
+  usuario: User; 
 }

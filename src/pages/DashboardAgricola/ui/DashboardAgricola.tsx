@@ -3,6 +3,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'; // Sin esto, el mapa se rompe.
 import Map from 'react-map-gl/maplibre';
 import { useNavigate } from 'react-router-dom';
 import { DrawControl } from './DrawControl';
+import { MunicipioSelector } from '../../../features/municipios/ui/MunicipioSelector';
 
 export const DashboardAgricola = () => {
   const navigate = useNavigate();
@@ -44,6 +45,11 @@ export const DashboardAgricola = () => {
               <path d="M19 12H5"/>
             </svg>
           </button>
+
+          {/* Inyecta el Selector Espacial en la esquina derecha */}
+          <div className="pointer-events-auto">
+            <MunicipioSelector />
+          </div>
 
         </header>
         

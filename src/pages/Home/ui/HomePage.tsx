@@ -1,4 +1,6 @@
+// src/pages/Home/ui/HomePage.tsx
 import { useNavigate } from 'react-router-dom';
+import { TelemetryMapPreview } from './TelemetryMapPreview';
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -12,14 +14,13 @@ export const HomePage = () => {
         onClick={() => navigate('/mapa')}
         className="flex-1 min-h-[180px] w-full relative rounded border border-slate-800 bg-[#121212] overflow-hidden group hover:border-slate-600 transition-colors flex flex-col items-center justify-center cursor-pointer"
       >
-        {/* Patrón de grilla sutil para simular el "mock" del mapa de forma sobria */}
-        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px] opacity-20 group-hover:opacity-40 transition-opacity"></div>
+        <TelemetryMapPreview />
         
-        <div className="relative z-10 flex flex-col items-center">
-          <span className="font-mono text-cyan-500 uppercase tracking-widest text-sm mb-1 drop-shadow-md">
+        <div className="relative z-10 flex flex-col items-center p-1 bg-[#0a0a0a]/80 rounded border border-slate-800/50">
+          {/*<span className="font-mono text-cyan-500 uppercase tracking-widest text-sm mb-1 drop-shadow-md">
             Módulo de Telemetría
-          </span>
-          <span className="text-slate-500 text-xs uppercase tracking-wider">
+          </span>*/}
+          <span className="text-slate-400 text-xs uppercase tracking-wider">
             [ Iniciar Navegación ]
           </span>
         </div>

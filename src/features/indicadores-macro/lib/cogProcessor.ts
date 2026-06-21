@@ -47,6 +47,31 @@ export const processCogUrl = async (url: string, indicatorType: string): Promise
     // Asumimos que la banda 1 contiene nuestro índice (NDVI o LST)
     const data = rasters[0] as Float32Array; 
 
+    // ---> INYECTAR ESTA SONDA <---
+    // Tomamos 10 píxeles justo del medio de la matriz de la imagen
+    /* const midPoint = Math.floor(data.length / 2);
+    console.log(`[Raster Scanner] Total de píxeles: ${data.length}`);
+    console.log(`[Raster Scanner] Muestra de valores crudos:`, data.slice(midPoint, midPoint + 10));*/
+
+    // ---> SONDA 3: ESCÁNER PROFUNDO <---
+    /*let minVal = Infinity;
+    let maxVal = -Infinity;
+    let validPixels = 0;
+
+    for (let i = 0; i < data.length; i++) {
+      const val = data[i];
+      // Ignoramos el 0 (NoData) y los Not-a-Number
+      if (val !== 0 && !isNaN(val)) {
+        if (val < minVal) minVal = val;
+        if (val > maxVal) maxVal = val;
+        validPixels++;
+      }
+    }
+    
+    console.log(`[Raster Scanner] Píxeles con datos biológicos/térmicos: ${validPixels} de ${data.length}`);
+    console.log(`[Raster Scanner] Rango Termodinámico Real: MIN = ${minVal} | MAX = ${maxVal}`);
+    */
+
     // 4. El Laboratorio: Creación del lienzo (Canvas) en la memoria RAM
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -59,6 +84,15 @@ export const processCogUrl = async (url: string, indicatorType: string): Promise
     // 5. Transformación Matemática -> Píxeles Visuales
     for (let i = 0; i < data.length; i++) {
       const value = data[i];
+      const pixelIndex = i * 4;
+
+      // OPTIMIZACIÓN: Si es NoData (0), lo dejamos transparente y saltamos al siguiente píxel
+      // Esto ahorra miles de ciclos de procesamiento de CPU
+      if (value === 0 || isNaN(value)) {
+        imageData.data[pixelIndex + 3] = 0; // Alpha = 0 (Transparente)
+        continue;
+      }
+
       let color: [number, number, number, number] = [0, 0, 0, 0];
 
       // Inyección a través de las rampas de color
@@ -69,7 +103,7 @@ export const processCogUrl = async (url: string, indicatorType: string): Promise
       }
 
       // Mapeo RGBA lineal: Un pixel en ImageData ocupa 4 espacios secuenciales en el array
-      const pixelIndex = i * 4;
+    
       imageData.data[pixelIndex] = color[0];     // Red
       imageData.data[pixelIndex + 1] = color[1]; // Green
       imageData.data[pixelIndex + 2] = color[2]; // Blue

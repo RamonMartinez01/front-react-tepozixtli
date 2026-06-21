@@ -30,11 +30,16 @@ export const getNdviColor = (value: number): [number, number, number, number] =>
  * Convierte un valor LST (Land Surface Temperature en °C) a RGBA.
  * Utiliza una rampa térmica que asume un rango típico de 10°C a 50°C.
  */
-export const getLstColor = (celsius: number): [number, number, number, number] => {
-  if (isNaN(celsius)) return [0, 0, 0, 0];
+export const getLstColor = (rawValue: number): [number, number, number, number] => {
+  // 1. Filtrado inmediato del NoData (El rectángulo azul desaparece aquí)
+  if (rawValue === 0 || isNaN(rawValue)) return [0, 0, 0, 0];
 
-  const minT = 10;
-  const maxT = 50;
+  // 2. Detección y conversión termodinámica (Kelvin a Celsius)
+  // Si el valor es mayor a 100, es seguro asumir que el satélite habla en Kelvin
+  const celsius = rawValue > 100 ? rawValue - 273.15 : rawValue;
+
+  const minT = 0;  // 0°C (Azul/Frío)
+  const maxT = 45; // 45°C (Rojo/Calor Extremo)
   
   // Normalizamos la temperatura a un coeficiente entre 0 y 1
   let pct = (celsius - minT) / (maxT - minT);
@@ -58,8 +63,5 @@ export const getLstColor = (celsius: number): [number, number, number, number] =
     b = 0;
   }
 
-  // Transparencia: Ocultamos los píxeles extremadamente fríos (suelen ser nubes/errores en LST)
-  const alpha = celsius < -5 ? 0 : 255;
-
-  return [r, g, b, alpha];
+  return [r, g, b, 255];
 };

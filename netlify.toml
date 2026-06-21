@@ -1,0 +1,17 @@
+# 1. building intruccions
+[build]
+  command = "npm run build"
+  publish = "dist" # Vite compila la app dentro de esta carpeta por defecto
+
+# 2.PROXY 
+[[redirects]]
+  from = "/api/*"
+  to = "http://142.93.93.98:8001/api/:splat" 
+  status = 200
+  force = true
+
+# 3. SPA ROUTING (React Router life-jacket)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

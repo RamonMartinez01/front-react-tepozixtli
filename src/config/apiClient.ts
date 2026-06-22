@@ -1,7 +1,7 @@
 // src/config/apiClient.ts
 
 // Vite expone las variables de entorno a través de import.meta.env
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const handleResponse = async (response: Response) => {
   if (!response.ok) {

@@ -1,16 +1,10 @@
-# 1. building intruccions
+# 1. Building instructions & Dynamic Proxy Generation
 [build]
-  command = "npm run build"
-  publish = "dist" # Vite compila la app dentro de esta carpeta por defecto
+  # Compilamos la app y, acto seguido, inyectamos la variable cifrada en un archivo _redirects dentro de dist
+  command = "npm run build && echo \"/api/* $PROXIED_BACKEND_URL/api/:splat 200!\" > dist/_redirects"
+  publish = "dist"
 
-# 2.PROXY 
-[[redirects]]
-  from = "/api/*"
-  to = "http://142.93.93.98:8001/api/:splat" 
-  status = 200
-  force = true
-
-# 3. SPA ROUTING (React Router life-jacket)
+# 2. SPA ROUTING (React Router life-jacket)
 [[redirects]]
   from = "/*"
   to = "/index.html"

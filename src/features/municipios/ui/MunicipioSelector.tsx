@@ -1,14 +1,29 @@
 // src/features/municipios/ui/MunicipioSelector.tsx
+import { useEffect } from 'react';
 import { useMunicipios } from '../hooks/useMunicipios';
+import { Select } from '../../../shared/ui/Select';
 import type { Municipio } from '../model/types';
 
 // Define el contrato de comunicación hacia el exterior
 interface MunicipioSelectorProps {
+    cveEnt: string;
     onMunicipioSelect: (municipio: Municipio | null) => void;
 }
 
-export const MunicipioSelector = ({ onMunicipioSelect }: MunicipioSelectorProps) => {
-    const { municipios, isLoading, error, fetchByEntidad } = useMunicipios();
+export const MunicipioSelector: React.FC<MunicipioSelectorProps> = ({
+    cveEnt,
+    onMunicipioSelect
+}) => {
+    const { municipios, isLoading, error, fetchByEntidad, clearMunicipios } = useMunicipios();
+
+    // Efecto reactivo: cuando cambia la entidad orquestadora, descargamos sus municipios
+    useEffect(() => {
+        if (cveEnt) {
+            fetchByEntidad(cveEnt);
+        } else {
+            clearMunicipios();
+        }
+    }, [cveEnt, fetchByEntidad, clearMunicipios]);
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const cvegeo = e.target.value;
@@ -19,51 +34,29 @@ export const MunicipioSelector = ({ onMunicipioSelect }: MunicipioSelectorProps)
         onMunicipioSelect(selected);
     };
 
-    return (
-        // Panel flotante: Fondo oscuro, borde sutil, tipografía monoespaciada
-        <div className="bg-[#0f0f0f]/95 backdrop-blur-md border border-slate-800 rounded-lg p-4 font-mono text-sm w-80 shadow-2xl pointer-events-auto">
+    // Mapeamos al contrato de <Select />
+    const options = municipios.map((mun) => ({
+        value: mun.cvegeo,
+        label: `[${mun.cveMun || mun.cvegeo.substring(2)}] ${mun.nommun}`,
+    }));
 
-            <h3 className="text-cyan-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2 text-xs font-bold">
-                Título buscador
-            </h3>
-
-            <div className="flex flex-col gap-3">
-                {/* Botón de prueba táctica para la entidad 02 */}
-                <button
-                    onClick={() => fetchByEntidad('13')}
-                    disabled={isLoading}
-                    className="bg-[#121212] border border-slate-700 hover:border-cyan-500 text-slate-300 py-2 px-4 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-xs"
-                >
-                    {isLoading ? '[ DESCARGANDO TELEMETRÍA... ]' : '[ CARGAR ENTIDAD: 13 ]'}
-                </button>
-
-                {/* Pantalla de Error */}
-                {error && (
-                    <div className="text-red-400 border border-red-900/50 bg-red-950/20 p-2 rounded text-xs">
-                        &gt; ERROR CRÍTICO: {error}
-                    </div>
-                )}
-
-                {/* Pantalla de Resultados (Solo se muestra si hay datos) */}
-                {municipios.length > 0 && (
-                    <div className="mt-2 animate-fade-in">
-                        <label className="text-slate-500 text-[10px] uppercase mb-1 block">
-                            Polígonos Detectados ({municipios.length})
-                        </label>
-                        <select
-                            onChange={handleSelectChange}
-                            className="w-full bg-[#050505] border border-slate-700 text-slate-300 rounded p-2 focus:border-cyan-500 focus:outline-none transition-colors text-xs cursor-pointer"
-                        >
-                            <option value="">-- Seleccionar Polígono --</option>
-                            {municipios.map((mun) => (
-                                <option key={mun.id} value={mun.cvegeo}>
-                                    [{mun.cveMun}] {mun.nommun}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
+    // Renderizado condicional del error si falla la red
+    if (error) {
+        return (
+            <div className="text-red-600 bg-red-50 border border-red-200 p-2 rounded-md text-xs shadow-sm">
+                Error al cargar municipios: {error}
             </div>
-        </div>
-    );
+        );
+    }
+    
+    // Si no hay entidad seleccionada, deshabilitamos el selector
+  return (
+    <Select
+      label="2. Municipio"
+      placeholder={isLoading ? "Descargando telemetría..." : "-- Seleccionar Polígono --"}
+      options={options}
+      onChange={handleSelectChange}
+      disabled={isLoading || !cveEnt || municipios.length === 0}
+    />
+  );
 };

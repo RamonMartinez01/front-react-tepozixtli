@@ -5,6 +5,7 @@ import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre'
 import { useNavigate } from 'react-router-dom';
 import { DrawControl } from './DrawControl';
+import { EntidadSelector } from '../../../features/entidades/ui/EntidadSelector'
 import { MunicipioSelector } from '../../../features/municipios/ui/MunicipioSelector';
 import type { Municipio } from '../../../features/municipios/model/types';
 import { getPolygonCentroid } from '../../../features/municipios/lib/geoUtils';
@@ -17,11 +18,19 @@ export const DashboardAgricola = () => {
   // Referencia maestra para interactuar directamente con la API de MapLibre
   const mapRef = useRef<MapRef>(null);
 
-  // Estado para almacenar el objeto geográfico activo
+  // Estadosd de orquestación
+  const [activeCveEnt, setActiveCveEnt] = useState<string>('');
   const [selectedMunicipio, setSelectedMunicipio] = useState<Municipio | null>(null);
 
   // Para controlar la memoria del raster activo
   const [activeRaster, setActiveRaster] = useState<{ url: string; tipo: string } | null>(null);
+
+  // Manejador en cascada: Cuando cambia el estado, reseteamos el municipio y el raster
+  const handleEntidadSelect = (cveEnt: string) => {
+    setActiveCveEnt(cveEnt);
+    setSelectedMunicipio(null);
+    setActiveRaster(null);
+  };
 
   /**
    * Orquestador del renderizado de municipios
@@ -97,7 +106,7 @@ export const DashboardAgricola = () => {
               id="municipio-layer-outline"
               type="line"
               paint={{
-                'line-color': '#22d3ee',
+                'line-color': '#10b981',
                 'line-width': 2,
               }}
             />
@@ -122,10 +131,21 @@ export const DashboardAgricola = () => {
             </button>
           </header>
 
-          <div className="pointer-events-auto flex flex-col items-end">
-            <MunicipioSelector onMunicipioSelect={handleMunicipioSelect} />
+          <div className="pointer-events-auto flex flex-col items-end gap-3">
+            {/* Nuevo panel unificado y claro para los selectores geográficos */}
+            <div className="bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg p-4 w-80 shadow-xl flex flex-col gap-4">
+              <EntidadSelector 
+                onEntidadSelect={handleEntidadSelect} 
+                selectedCveEnt={activeCveEnt} 
+              />
+              
+              <MunicipioSelector 
+                cveEnt={activeCveEnt}
+                onMunicipioSelect={handleMunicipioSelect} 
+              />
+            </div>
             
-            {/* Si hay un municipio seleccionado, desplegamos las opciones satelitales */}
+            {/* Panel satelital (Mantenemos su estilo oscuro por ahora, hasta su propio refactor) */}
             {selectedMunicipio && (
               <IndicadorControlPanel 
                 municipio={selectedMunicipio} 

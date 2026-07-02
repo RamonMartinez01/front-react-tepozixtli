@@ -22,17 +22,17 @@ export const Select: React.FC<SelectProps> = ({
   ...props
 }) => {
   return (
-    <div className={`flex flex-col gap-1 w-full ${className}`}>
+    <div className={`flex flex-col gap-1.5 w-full ${className}`}>
       {label && (
-        <label className="text-slate-500 text-[10px] uppercase block animate-fade-in">
+        <label className="text-slate-600 text-xs font-medium uppercase tracking-wider block animate-fade-in">
           {label}
         </label>
       )}
       <select
-        className="w-full bg-[#050505] border border-slate-700 text-slate-300 rounded p-2 focus:border-cyan-500 focus:outline-none transition-colors text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-white border border-slate-300 text-slate-700 rounded-md py-2 px-3 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none transition-all text-sm shadow-sm cursor-pointer disabled:opacity-50 disabled:bg-slate-50 disabled:cursor-not-allowed hover:border-slate-400"
         {...props}
       >
-        <option value="">{placeholder}</option>
+        <option value="" disabled>{placeholder}</option>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}

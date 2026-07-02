@@ -1,69 +1,73 @@
 // src/features/municipios/ui/MunicipioSelector.tsx
+import { useState } from 'react';
 import { useMunicipios } from '../hooks/useMunicipios';
+import { Select } from '../../../shared/ui/Select';
 import type { Municipio } from '../model/types';
 
 // Define el contrato de comunicación hacia el exterior
 interface MunicipioSelectorProps {
+    cveEnt: string;
     onMunicipioSelect: (municipio: Municipio | null) => void;
 }
 
-export const MunicipioSelector = ({ onMunicipioSelect }: MunicipioSelectorProps) => {
-    const { municipios, isLoading, error, fetchByEntidad } = useMunicipios();
+export const MunicipioSelector: React.FC<MunicipioSelectorProps> = ({
+    cveEnt,
+    onMunicipioSelect
+}) => {
 
-    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const cvegeo = e.target.value;
-        // Busca el objeto municipio completo dentro de nuestra memoria local
-        const selected = municipios.find((m) => m.cvegeo === cvegeo) || null;
+    const { municipios, isLoading, error, fetchMunicipioGeometry } = useMunicipios(cveEnt);
 
-        // Emite el municipio seleccionado hacia el orquestador (Dashboard)
-        onMunicipioSelect(selected);
-    };
+    // Estado local para bloquear el selector mientras descargamos el GeoJSON
+    const [isFetchingGeometry, setIsFetchingGeometry] = useState(false)
 
+   const handleSelectChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const cvegeo = e.target.value;
+    
+    if (!cvegeo) {
+      onMunicipioSelect(null);
+      return;
+    }
+
+    setIsFetchingGeometry(true);
+    // Solicitamos la carga pesada al seleccionar
+    const municipioConGeometria = await fetchMunicipioGeometry(cvegeo);
+    setIsFetchingGeometry(false);
+    
+    // Enviamos el objeto completo (ya con la propiedad geom) al Dashboard
+    onMunicipioSelect(municipioConGeometria);
+  };
+
+// Map limpio solo usando el nombre del municipio (nomgeo)
+  const options = municipios.map((mun) => ({
+    value: mun.cvegeo,
+    label: mun.nomgeo,
+  }));
+
+// Renderizado condicional del error si falla la red
+if (error) {
     return (
-        // Panel flotante: Fondo oscuro, borde sutil, tipografía monoespaciada
-        <div className="bg-[#0f0f0f]/95 backdrop-blur-md border border-slate-800 rounded-lg p-4 font-mono text-sm w-80 shadow-2xl pointer-events-auto">
-
-            <h3 className="text-cyan-500 uppercase tracking-widest mb-4 border-b border-slate-800 pb-2 text-xs font-bold">
-                Título buscador
-            </h3>
-
-            <div className="flex flex-col gap-3">
-                {/* Botón de prueba táctica para la entidad 02 */}
-                <button
-                    onClick={() => fetchByEntidad('13')}
-                    disabled={isLoading}
-                    className="bg-[#121212] border border-slate-700 hover:border-cyan-500 text-slate-300 py-2 px-4 rounded transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-xs"
-                >
-                    {isLoading ? '[ DESCARGANDO TELEMETRÍA... ]' : '[ CARGAR ENTIDAD: 13 ]'}
-                </button>
-
-                {/* Pantalla de Error */}
-                {error && (
-                    <div className="text-red-400 border border-red-900/50 bg-red-950/20 p-2 rounded text-xs">
-                        &gt; ERROR CRÍTICO: {error}
-                    </div>
-                )}
-
-                {/* Pantalla de Resultados (Solo se muestra si hay datos) */}
-                {municipios.length > 0 && (
-                    <div className="mt-2 animate-fade-in">
-                        <label className="text-slate-500 text-[10px] uppercase mb-1 block">
-                            Polígonos Detectados ({municipios.length})
-                        </label>
-                        <select
-                            onChange={handleSelectChange}
-                            className="w-full bg-[#050505] border border-slate-700 text-slate-300 rounded p-2 focus:border-cyan-500 focus:outline-none transition-colors text-xs cursor-pointer"
-                        >
-                            <option value="">-- Seleccionar Polígono --</option>
-                            {municipios.map((mun) => (
-                                <option key={mun.id} value={mun.cvegeo}>
-                                    [{mun.cveMun}] {mun.nommun}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
-            </div>
+        <div className="text-red-600 bg-red-50 border border-red-200 p-2 rounded-md text-xs shadow-sm">
+            Error al cargar municipios: {error}
         </div>
     );
+}
+
+// Textos dinámicos para informar al usuario si estamos cargando el catálogo o la geometría
+  const placeholderText = isLoading 
+    ? "Descargando catálogo..." 
+    : isFetchingGeometry 
+      ? "Descargando polígono..." 
+      : "-- Seleccionar Municipio --";
+
+// Si no hay entidad seleccionada, deshabilitamos el selector
+return (
+    <Select
+        label="2. Municipio"
+        placeholder={placeholderText}
+        options={options}
+        onChange={handleSelectChange}
+        // Bloquea el input si esta descargando cualquiera de los dos recursos
+         disabled={isLoading || isFetchingGeometry || !cveEnt || municipios.length === 0}
+    />
+);
 };

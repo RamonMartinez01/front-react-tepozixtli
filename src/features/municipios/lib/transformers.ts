@@ -6,14 +6,10 @@ import type { MunicipioApi, Municipio } from '../model/types'
  */
 export const transformMunicipio = (data: MunicipioApi): Municipio => {
   return {
-    id: data.id,
     cvegeo: data.cvegeo,
     cveEnt: data.cve_ent,
     nomgeo: data.nomgeo,
     cveMun: data.cve_mun,
-    nommun: data.nommun,
-    cov: data.cov,
-    covId: data.cov_id,
     geom: data.geom,
   };
 };

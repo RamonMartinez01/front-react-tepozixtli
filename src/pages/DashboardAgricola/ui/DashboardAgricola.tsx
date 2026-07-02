@@ -12,6 +12,7 @@ import { IndicadorControlPanel } from '../../../features/indicadores-macro/ui/In
 import { RasterLayerManager } from '../../../features/indicadores-macro/ui/RasterLayerManager';
 
 export const DashboardAgricola = () => {
+  const mapTilerKey = import.meta.env.VITE_MAPTILER_API_KEY;
   const navigate = useNavigate();
   // Referencia maestra para interactuar directamente con la API de MapLibre
   const mapRef = useRef<MapRef>(null);
@@ -48,6 +49,8 @@ export const DashboardAgricola = () => {
   };
 
 
+
+
   return (
     // Contenedor a pantalla completa (100% del viewport)
     <div className="h-screen w-screen bg-[#0a0a0a] overflow-hidden relative">
@@ -60,7 +63,7 @@ export const DashboardAgricola = () => {
           latitude: 19.4326,
           zoom: 5
         }}
-        mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+        mapStyle={`https://api.maptiler.com/maps/hybrid/style.json?key=${mapTilerKey}`}
         style={{ width: '100%', height: '100%' }}
       >
 

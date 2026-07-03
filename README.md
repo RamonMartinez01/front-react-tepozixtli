@@ -31,10 +31,6 @@ Handling complex geospatial operations and asynchronous data fetching in a React
 ### Server State (TanStack Query)
 We completely abandoned traditional `useEffect` data fetching. All communication with the FastAPI backend is orchestrated through TanStack Query (React Query). This provides out-of-the-box caching, request deduplication, and automatic background revalidation. When a new satellite processing task is completed, React Query intuitively invalidates the specific cache keys, ensuring the map updates organically without full page reloads.
 
-### Network Layer & Edge Proxying
-Data fetching is standardized through a custom `fetch` API wrapper (`apiClient.ts`), guaranteeing consistent error handling and payload parsing across all modules.
-Crucially, to securely communicate with the DigitalOcean backend and avoid browser-level CORS (Cross-Origin Resource Sharing) or "Mixed Content" blocks (HTTPS to HTTP), the application utilizes a Reverse Proxy configured at the edge via `netlify.toml`. The React client makes clean, relative requests (e.g., `/api/v1/...`), which Netlify transparently intercepts and routes to the production Droplet.
-
 ### Client State (Minimalist Approach)
 By delegating all remote data management to TanStack Query, the global client state footprint is drastically reduced. We deliberately avoided heavy boilerplate libraries like Redux. UI-specific state (such as the currently active municipality or selected raster layer) is managed via localized `useState` hooks, keeping the component tree lightweight and highly performant.
 

@@ -95,7 +95,7 @@ export const DashboardAgricola = () => {
               type: 'Feature',
               properties: {
                 cvegeo: selectedMunicipio.cvegeo,
-                nombre: selectedMunicipio.nommun
+                nombre: selectedMunicipio.nomgeo
               },
               geometry: selectedMunicipio.geom
             } as any}

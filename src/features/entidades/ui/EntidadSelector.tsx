@@ -5,7 +5,7 @@ import { Select } from '../../../shared/ui/Select';
 import type { Entidad } from '../model/types';
 
 interface EntidadSelectorProps {
-  onEntidadSelect: (cveEnt: string) => void;
+  onEntidadSelect: (entidad: Entidad | null) => void;
   selectedCveEnt?: string;
 }
 
@@ -22,7 +22,12 @@ export const EntidadSelector: React.FC<EntidadSelectorProps> = ({
   }));
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    onEntidadSelect(e.target.value);
+    const cve = e.target.value;
+    // Busca el objeto completo que coincida con el valor seleccionado
+    const selected = entidades.find((ent) => ent.cve_ent === cve) || null;
+    
+    // Emite el objeto hacia el Dashboard
+    onEntidadSelect(selected);
   };
 
   if (isError) {
@@ -42,7 +47,7 @@ export const EntidadSelector: React.FC<EntidadSelectorProps> = ({
       onChange={handleChange}
       disabled={isLoading}
       // Le damos un ancho fijo o un mínimo para mantener consistencia en el panel
-      className="min-w-[240px] pointer-events-auto shadow-lg"
+      className="min-w-[240px] pointer-events-auto shadow-sm"
     />
   );
 };

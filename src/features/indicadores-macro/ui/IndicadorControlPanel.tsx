@@ -12,18 +12,13 @@ export const IndicadorControlPanel = ({ municipio, onRasterReady }: IndicadorCon
   const { fetchIndicador, isLoading, error } = useIndicadoresMacro();
 
   const handleFetch = async (tipo: string) => {
-    // Llamamos a tu backend solicitando el historial (sin fecha exacta por ahora para asegurar que traiga el último disponible)
-    const result = await fetchIndicador('municipio', String(municipio.id), tipo);
+    // Llamamos al backend solicitando el historial del municipio
+    const result = await fetchIndicador('municipio', String(municipio.cvegeo), tipo);
     
     if (result) {
-      // Como tu backend devuelve un historial (Array) si no hay fecha, tomamos el mapa más reciente (índice 0)
+      // Tomamos el mapa más reciente (índice 0)
       const data = Array.isArray(result) ? result[0] : result;
-/*
-      // ---> Check data <---
-console.log(`[Telemetría Backend] Indicador: ${tipo}`);
-console.log(`[Telemetría Backend] Fecha de Captura:`, data?.fechaCaptura);
-console.log(`[Telemetría Backend] URL del COG:`, data?.cogUrl);
-*/
+
       if (data && data.cogUrl) {
         onRasterReady(data.cogUrl, data.tipoIndicador);
       }
@@ -31,31 +26,35 @@ console.log(`[Telemetría Backend] URL del COG:`, data?.cogUrl);
   };
 
   return (
-    <div className="bg-[#0f0f0f]/95 backdrop-blur-md border border-slate-800 rounded-lg p-4 font-mono text-sm w-80 shadow-2xl pointer-events-auto mt-4 animate-fade-in">
-      <h3 className="text-emerald-500 uppercase tracking-widest mb-3 border-b border-slate-800 pb-2 text-xs font-bold">
-        Escáner Satelital // {municipio.nommun}
+    <div className="bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg p-4 w-80 shadow-xl pointer-events-auto mt-4 animate-fade-in">
+      <h3 className="text-slate-500 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2 text-xs font-semibold flex flex-col gap-1">
+        <span>Análisis Satelital</span>
+        {/* Corrección crítica: usamos nomgeo en lugar del obsoleto nommun */}
+        <span className="text-emerald-600 font-bold">{municipio.nomgeo}</span>
       </h3>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <button
           onClick={() => handleFetch('NDVI')}
           disabled={isLoading}
-          className="bg-emerald-950/30 border border-emerald-900 hover:border-emerald-500 text-emerald-400 py-2 px-4 rounded transition-all disabled:opacity-50 active:scale-[0.98] text-xs"
+          className="bg-emerald-50 border border-emerald-200 hover:border-emerald-400 hover:bg-emerald-100 text-emerald-700 py-2.5 px-4 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-xs font-medium flex justify-between items-center shadow-sm"
         >
-          {isLoading ? '[ ANALIZANDO... ]' : '[ ÍNDICE VEGETATIVO (NDVI) ]'}
+          <span>{isLoading ? 'Analizando...' : 'Índice Vegetativo (NDVI)'}</span>
+          {!isLoading && <span className="text-emerald-700/40 text-[10px]">COPERNICUS</span>}
         </button>
 
         <button
           onClick={() => handleFetch('LST')}
           disabled={isLoading}
-          className="bg-orange-950/30 border border-orange-900 hover:border-orange-500 text-orange-400 py-2 px-4 rounded transition-all disabled:opacity-50 active:scale-[0.98] text-xs"
+          className="bg-orange-50 border border-orange-200 hover:border-orange-400 hover:bg-orange-100 text-orange-700 py-2.5 px-4 rounded-md transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] text-xs font-medium flex justify-between items-center shadow-sm"
         >
-          {isLoading ? '[ ANALIZANDO... ]' : '[ TEMPERATURA SUPERFICIAL (LST) ]'}
+          <span>{isLoading ? 'Analizando...' : 'Temp. Superficial (LST)'}</span>
+          {!isLoading && <span className="text-orange-700/40 text-[10px]">COPERNICUS</span>}
         </button>
 
         {error && (
-          <div className="text-red-400 border border-red-900/50 bg-red-950/20 p-2 rounded text-[10px] mt-2">
-            &gt; FALLO DE TELEMETRÍA: {error}
+          <div className="text-red-600 border border-red-200 bg-red-50 p-2.5 rounded-md text-xs mt-1 shadow-sm">
+            Error de telemetría: {error}
           </div>
         )}
       </div>

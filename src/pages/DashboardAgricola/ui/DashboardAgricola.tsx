@@ -3,7 +3,6 @@ import 'maplibre-gl/dist/maplibre-gl.css'; // Sin esto, el mapa se rompe.
 import { useRef, useState } from 'react';
 import Map, { Source, Layer } from 'react-map-gl/maplibre';
 import type { MapRef } from 'react-map-gl/maplibre'
-import { useNavigate } from 'react-router-dom';
 import { DrawControl } from './DrawControl';
 import { EntidadSelector } from '../../../features/entidades/ui/EntidadSelector'
 import type { Entidad } from '../../../features/entidades/model/types';
@@ -15,7 +14,6 @@ import { RasterLayerManager } from '../../../features/indicadores-macro/ui/Raste
 
 export const DashboardAgricola = () => {
   const mapTilerKey = import.meta.env.VITE_MAPTILER_API_KEY;
-  const navigate = useNavigate();
   // Referencia maestra para interactuar directamente con la API de MapLibre
   const mapRef = useRef<MapRef>(null);
 

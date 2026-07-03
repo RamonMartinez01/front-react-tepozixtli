@@ -120,20 +120,7 @@ export const DashboardAgricola = () => {
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-10 flex flex-col justify-between p-6">
         <div className="flex justify-between items-start w-full">
 
-          <header className="pointer-events-auto flex items-start gap-4">
-            <button
-              onClick={() => navigate('/')}
-              className="mt-1 bg-[#121212] border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 p-2 rounded-lg transition-all cursor-pointer shadow-lg group"
-              title="Regresar"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform">
-                <path d="m12 19-7-7 7-7" />
-                <path d="M19 12H5" />
-              </svg>
-            </button>
-          </header>
-
-          <div className="pointer-events-auto flex flex-col items-end gap-3">
+          <div className="pointer-events-auto flex flex-col items-end gap-1">
             {/* 4. Nuevo panel unificado y colapsable para los selectores geográficos */}
             <div className="bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg w-80 shadow-xl flex flex-col transition-all duration-300 ease-in-out">
 

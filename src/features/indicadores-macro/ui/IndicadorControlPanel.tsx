@@ -30,7 +30,7 @@ export const IndicadorControlPanel = ({ municipio, onRasterReady }: IndicadorCon
   };
 
   return (
-    <div className="bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg w-80 shadow-xl pointer-events-auto mt-4 transition-all duration-300 ease-in-out">
+    <div className="bg-white/95 backdrop-blur-md border border-slate-200 rounded-lg w-80 shadow-xl pointer-events-auto mt-2 transition-all duration-300 ease-in-out">
       {/* Encabezado interactivo */}
       <div 
         className="py-1.5 px-4 flex justify-between items-center cursor-pointer hover:bg-slate-50/50 rounded-lg transition-colors border-b border-transparent data-[expanded=true]:border-slate-200 data-[expanded=true]:rounded-b-none"

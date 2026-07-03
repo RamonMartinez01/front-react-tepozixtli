@@ -1,6 +1,6 @@
 // src/app/layouts/MainLayout.tsx
 import { useState, useEffect, useRef } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const MainLayout = () => {
   // Control de estado para el despliegue del menú de navegación
@@ -11,6 +11,8 @@ export const MainLayout = () => {
 
   // Sensor de navegación para saber cuándo cambia la página
   const location = useLocation();
+
+  const navigate = useNavigate();
 
   // Cierra el menú automáticamente cada vez que la URL cambie
   useEffect(() => {
@@ -43,13 +45,29 @@ export const MainLayout = () => {
       {/* Encabezado Global */}
       <header className="h-12 border-b border-slate-800 flex items-center justify-between px-6 bg-[#0f0f0f] z-20 shadow-md">
          
-         {/* Logo / Link Principal */}
-         <Link 
-            to="/" 
-            className="text-cyan-500 font-bold uppercase tracking-widest text-sm hover:text-cyan-400 transition-colors cursor-pointer"
-         >
-           Hñäki
-         </Link>
+         <div className="flex items-center gap-4">
+           <Link 
+             to="/" 
+             className="text-cyan-500 font-bold uppercase tracking-widest text-sm hover:text-cyan-400 transition-colors cursor-pointer"
+           >
+             Hñäki
+           </Link>
+
+           {/* El botón solo se renderiza si NO estamos en el Home */}
+           {location.pathname !== '/' && (
+             <button
+               // navigate(-1) regresa a la página anterior en el historial, al estilo del navegador
+               onClick={() => navigate(-1)} 
+               className="bg-[#121212] border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 p-1.5 rounded transition-all cursor-pointer shadow-sm group"
+               title="Regresar"
+             >
+               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform">
+                 <path d="m12 19-7-7 7-7"/>
+                 <path d="M19 12H5"/>
+               </svg>
+             </button>
+           )}
+         </div>
 
          {/* Contenedor del Menú Desplegable */}
          <div 

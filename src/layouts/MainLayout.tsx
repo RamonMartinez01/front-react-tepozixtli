@@ -3,62 +3,51 @@ import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 
 export const MainLayout = () => {
-  // Control de estado para el despliegue del menú de navegación
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Referencia física al DOM para saber dónde está el menú
   const menuRef = useRef<HTMLDivElement>(null);
-
-  // Sensor de navegación para saber cuándo cambia la página
   const location = useLocation();
-
   const navigate = useNavigate();
 
-  // Cierra el menú automáticamente cada vez que la URL cambie
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location]);
 
-  // Cierra el menú al hacer clic fuera del contenedor
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      // Si el clic ocurrió, y NO fue dentro de nuestro contenedor del menú, entonces ciérralo
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
 
-    // Solo activamos el sensor ("listener") en el navegador si el menú está abierto
     if (isMenuOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
-    // Fase de limpieza para evitar fugas de memoria
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMenuOpen]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex flex-col font-sans text-slate-200 w-screen overflow-hidden">
+    // Cambiamos el fondo global a un gris muy claro (slate-50) y texto oscuro
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 w-screen overflow-hidden">
       
-      {/* Encabezado Global */}
-      <header className="h-12 border-b border-slate-800 flex items-center justify-between px-6 bg-[#0f0f0f] z-20 shadow-md">
+      {/* Encabezado Global: Blanco puro con sombra suave */}
+      <header className="h-12 border-b border-slate-200 flex items-center justify-between px-6 bg-white z-20 shadow-sm">
          
          <div className="flex items-center gap-4">
            <Link 
              to="/" 
-             className="text-cyan-500 font-bold uppercase tracking-widest text-sm hover:text-cyan-400 transition-colors cursor-pointer"
+             // Actualizamos el logo a un verde esmeralda profundo
+             className="text-emerald-700 font-bold uppercase tracking-widest text-sm hover:text-emerald-600 transition-colors cursor-pointer"
            >
              Hñäki
            </Link>
 
-           {/* El botón solo se renderiza si NO estamos en el Home */}
            {location.pathname !== '/' && (
              <button
-               // navigate(-1) regresa a la página anterior en el historial, al estilo del navegador
                onClick={() => navigate(-1)} 
-               className="bg-[#121212] border border-slate-700 hover:border-cyan-500 text-slate-300 hover:text-cyan-400 p-1.5 rounded transition-all cursor-pointer shadow-sm group"
+               className="bg-white border border-slate-200 hover:border-emerald-300 text-slate-500 hover:text-emerald-600 p-1.5 rounded transition-all cursor-pointer shadow-sm group"
                title="Regresar"
              >
                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:-translate-x-1 transition-transform">
@@ -69,58 +58,36 @@ export const MainLayout = () => {
            )}
          </div>
 
-         {/* Contenedor del Menú Desplegable */}
-         <div 
-            className="relative"
-            ref={menuRef}
-         >
+         <div className="relative" ref={menuRef}>
            <button
              onClick={() => setIsMenuOpen(!isMenuOpen)}
-             className="bg-[#121212] border border-slate-700 hover:border-slate-500 text-slate-300 px-4 py-2 rounded-md text-xs font-mono flex items-center gap-2 transition-all cursor-pointer select-none"
+             // Botón de menú con estética de dashboard moderno (sin fuente mono)
+             className="bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-600 px-4 py-1.5 rounded-md text-xs font-semibold tracking-wide flex items-center gap-2 transition-all cursor-pointer select-none shadow-sm"
            >
              MENU 
-             {/* Chevron SVG con rotación dinámica basada en el estado */}
              <svg 
-               xmlns="http://www.w3.org/2000/svg" 
-               width="14" 
-               height="12" 
-               viewBox="0 0 24 24" 
-               fill="none" 
-               stroke="currentColor" 
-               strokeWidth="2" 
-               strokeLinecap="round" 
-               strokeLinejoin="round" 
+               xmlns="http://www.w3.org/2000/svg" width="14" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" 
                className={`transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`}
              >
                <path d="m6 9 6 6 6-6"/>
              </svg>
            </button>
 
-           {/* Menú Flotante Absoluto (Solo se renderiza si isMenuOpen es verdadero) */}
            {isMenuOpen && (
-             <div className="absolute right-0 mt-2 w-52 rounded border border-slate-800 bg-[#121212] shadow-2xl z-50 py-1 font-mono text-xs">
-               
-               <Link
-                 to="/"
-                 className="block px-4 py-2.5 text-slate-400 hover:text-cyan-400 hover:bg-[#161616] transition-colors"
-               >
-                 &gt; Dashboard Principal
+             // Menú desplegable claro, con acentos esmeralda en hover
+             <div className="absolute right-0 mt-2 w-52 rounded-md border border-slate-200 bg-white shadow-xl z-50 py-1 text-sm font-medium animate-fade-in">
+               <Link to="/" className="block px-4 py-2.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors">
+                 Dashboard Principal
                </Link>
-               
-               <Link
-                 to="/mapa"
-                 className="block px-4 py-2.5 text-slate-400 hover:text-cyan-400 hover:bg-[#161616] transition-colors"
-               >
-                 &gt; Mapa / Indicadores
+               <Link to="/mapa" className="block px-4 py-2.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors">
+                 Mapa / Indicadores
                </Link>
-
              </div>
            )}
          </div>
 
       </header>
 
-      {/* Espacio de Inyección de Páginas */}
       <main className="flex-1 relative overflow-hidden">
         <Outlet />
       </main>

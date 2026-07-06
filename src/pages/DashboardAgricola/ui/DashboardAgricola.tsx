@@ -25,7 +25,7 @@ export const DashboardAgricola = () => {
   // Para controlar la memoria del raster activo
   const [activeRaster, setActiveRaster] = useState<{ url: string; tipo: string } | null>(null);
 
-  // Manejador en cascada: Cuando cambia el estado, reseteamos el municipio y el raster
+  // Manejador en cascada: Cuando cambia el estado (Entidad Federativa), reseteamos el municipio y el raster
   const handleEntidadSelect = (entidad: Entidad | null) => {
     setSelectedEntidad(entidad);
     setSelectedMunicipio(null);
@@ -163,6 +163,7 @@ export const DashboardAgricola = () => {
 
                   <MunicipioSelector 
                     cveEnt={selectedEntidad?.cve_ent || ''}
+                    selectedCvegeo={selectedMunicipio?.cvegeo}
                     onMunicipioSelect={handleMunicipioSelect} 
                   />
                 </div>

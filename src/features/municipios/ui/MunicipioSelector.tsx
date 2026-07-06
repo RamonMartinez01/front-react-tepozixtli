@@ -7,11 +7,13 @@ import type { Municipio } from '../model/types';
 // Define el contrato de comunicación hacia el exterior
 interface MunicipioSelectorProps {
     cveEnt: string;
+    selectedCvegeo?: string;
     onMunicipioSelect: (municipio: Municipio | null) => void;
 }
 
 export const MunicipioSelector: React.FC<MunicipioSelectorProps> = ({
     cveEnt,
+    selectedCvegeo,
     onMunicipioSelect
 }) => {
 
@@ -63,6 +65,7 @@ if (error) {
 return (
     <Select
         label="2. Municipio"
+        value={selectedCvegeo || ""}
         placeholder={placeholderText}
         options={options}
         onChange={handleSelectChange}

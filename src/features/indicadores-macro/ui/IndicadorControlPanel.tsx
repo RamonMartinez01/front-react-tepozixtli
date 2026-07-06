@@ -1,5 +1,5 @@
 // src/features/indicadores-macro/ui/IndicadorControlPanel.tsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIndicadoresMacro } from '../hooks/useIndicadoresMacro';
 import type { Municipio } from '../../municipios/model/types';
 
@@ -15,17 +15,33 @@ export const IndicadorControlPanel = ({ municipio, onRasterReady }: IndicadorCon
   //estado para controlar la visibilidad de los botones (inicia expandido)
   const [isExpanded, setIsExpanded] = useState(true);
 
+  // Para controlar la ausencia de datos (Empty State)
+  const [emptyState, setEmptyState] = useState<{ tipo: string; mensaje: string } | null>(null);
+
+  // Limpia la memoria del panel si el usuario cambia de municipio
+  useEffect(() => {
+    setEmptyState(null);
+  }, [municipio.cvegeo]);
+
   const handleFetch = async (tipo: string) => {
+    // Limpia cualquier estado vacío anterior antes de la nueva petición
+    setEmptyState(null);
+
     // Llamamos al backend solicitando el historial del municipio
     const result = await fetchIndicador('municipio', String(municipio.cvegeo), tipo);
-    
-    if (result) {
-      // Tomamos el mapa más reciente (índice 0)
-      const data = Array.isArray(result) ? result[0] : result;
 
-      if (data && data.cogUrl) {
-        onRasterReady(data.cogUrl, data.tipoIndicador);
-      }
+    // Extrae el primer mapa si es un array
+    const data = Array.isArray(result) ? result[0] : result;
+
+    if (data && data.cogUrl) {
+      // Escenario data a) Si hay datos reales, emitimos el evento al mapa
+      onRasterReady(data.cogUrl, data.tipoIndicador);
+    } else {
+      // Escenario data b) Si no hay datos (y no es un error de red duro), activamos el estado vacío
+      setEmptyState({
+        tipo,
+        mensaje: `Aún no contamos con registros satelitales de ${tipo} para ${municipio.nomgeo}.`
+      });
     }
   };
 
@@ -77,9 +93,22 @@ export const IndicadorControlPanel = ({ municipio, onRasterReady }: IndicadorCon
             {!isLoading && <span className="text-orange-700/40 text-[10px]">COPERNICUS</span>}
           </button>
 
+         {/* MENSAJES DE ESTADO */}
+          
+          {/* 1. Error de Telemetría (Rojo - Solo para fallas graves de red) */}
           {error && (
-            <div className="text-red-600 border border-red-200 bg-red-50 p-2.5 rounded-md text-xs mt-1 shadow-sm">
-              Error de telemetría: {error}
+            <div className="text-red-600 border border-red-200 bg-red-50 p-2.5 rounded-md text-xs mt-1 shadow-sm animate-fade-in">
+              Fallo de telemetría: {error}
+            </div>
+          )}
+
+          {/* 2. Empty State (Gris/Pizarra - Informativo, no bloqueante) */}
+          {emptyState && !error && !isLoading && (
+            <div className="bg-slate-50 border border-slate-200 p-3 rounded-md shadow-sm mt-1 animate-fade-in">
+              <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                <span className="font-semibold text-slate-700 block mb-1">Exploración pendiente</span>
+                {emptyState.mensaje} Nuestro sistema continúa en proceso de recolección de datos.
+              </p>
             </div>
           )}
         </div>

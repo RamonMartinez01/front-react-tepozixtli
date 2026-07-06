@@ -32,7 +32,7 @@ export const getNdviColor = (value: number): [number, number, number, number] =>
  */
 export const getLstColor = (rawValue: number): [number, number, number, number] => {
   // 1. Filtrado inmediato del NoData (El rectángulo azul desaparece aquí)
-  if (rawValue === 0 || isNaN(rawValue)) return [0, 0, 0, 0];
+  if (isNaN(rawValue)) return [0, 0, 0, 0];
 
   // 2. Detección y conversión termodinámica (Kelvin a Celsius)
   // Si el valor es mayor a 100, es seguro asumir que el satélite habla en Kelvin

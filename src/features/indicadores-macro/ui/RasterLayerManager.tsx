@@ -21,6 +21,8 @@ export const RasterLayerManager = ({ cogUrl, tipoIndicador }: RasterLayerManager
       return;
     }
 
+    // Limpiamos la imagen anterior inmediatamente para evitar "flashes" visuales
+    setProcessedData(null);
     // Bandera de seguridad para evitar fugas de memoria si el usuario cierra el mapa 
     // antes de que el archivo .tif termine de procesarse.
     let isMounted = true; 
@@ -60,13 +62,14 @@ export const RasterLayerManager = ({ cogUrl, tipoIndicador }: RasterLayerManager
   return (
     // Inyectamos la imagen procesada directamente en las coordenadas matemáticas
     <Source
-      id={`source-raster-${tipoIndicador}`}
+      // Usamos IDs estáticos. MapLibre actualizará la 'url' (la imagen) sin quejarse
+      id="source-raster-macro-activo"
       type="image"
       url={processedData.dataUrl}
       coordinates={processedData.coordinates}
     >
       <Layer
-        id={`layer-raster-${tipoIndicador}`}
+        id="layer-raster-macro-activo"
         type="raster"
         paint={{
           'raster-opacity': 0.75,       // 75% de opacidad para no ocultar la topografía base
